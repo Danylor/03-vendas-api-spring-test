@@ -1,60 +1,41 @@
 package io.github.manoelcampos.vendas.api.feature.cidade;
 
-import io.github.manoelcampos.vendas.api.feature.AbstractRepositoryTest;
-import io.github.manoelcampos.vendas.api.feature.estado.Estado;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springdoc.core.service.GenericResponseService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
-class CidadeRepositoryTest extends AbstractRepositoryTest {
+// Java Bean (bean = feijão ou grão): objeto java com getters e setters
+// Spring bean: objeto gerenciado pelo Spring.
+// JPA = Java Persistence API: é apenas uma especificação (como uma norma)
+// (API de Object Relational Mapping - ORM: Mapeamento Objeto-Relacional)
+@DataJpaTest
+class CidadeRepositoryTest {
+    /// Injeção de Dependêndica: instanciar automaticamente objetos
+    /// Só funciona se a classe onde o objeto será instanciado
+    /// for um Spring Bean, ou seja, for um objeto criado e gerenciado
+    /// pelo Spring.
+    /// `@Autowirded`: pedir pro spring instanciar um objeto pra mim.
+    /// Ele só faz isso com objetos Spring Bean.
     @Autowired
     private CidadeRepository repository;
-    private Cidade instance;
-
-    @BeforeEach
-    void setUp() {
-        this.instance = new Cidade("Cidade 1").setEstado(new Estado(1));
-        repository.save(instance);
-    }
-
-    @AfterEach
-    void tearDown() {
-        repository.delete(instance);
-    }
+    @Autowired
+    private GenericResponseService responseBuilder;
 
     @Test
-    void findById() {
-        assertNotNull(instance.getId());
-        assertTrue(repository.findById(instance.getId()).isPresent());
-    }
+    void findByDescricaoLike() {
+        final var listaObtida = repository.findByDescricaoLike("São %");
 
-    @Test
-    void deleteById() {
-        assertThrows(DataIntegrityViolationException.class, () -> {
-            repository.deleteById(1L);
-            repository.flush();
-        });
-
-        //assertConstraintViolation(ex, ConstraintKeys.FK_CIDADE__ESTADO);
-    }
-
-    @Test
-    void findFirstByDescricao() {
-        final var descricao = "Palmas";
-        final List<Cidade> result = repository.findByDescricaoLike(descricao);
-        assertEquals(1, result.size());
-        assertEquals(descricao, result.get(0).getDescricao());
-    }
-
-    @Test
-    void inserirDescricaoDuplicadaGeraExcecao() {
-        final var cidade = new Cidade(instance.getDescricao()).setEstado(new Estado(1));
-        assertThrows(DataIntegrityViolationException.class, () -> repository.save(cidade));
+        final var listaEsperada =
+                List.of(
+                        new Cidade(1L, "São Paulo"),
+                        new Cidade(13L, "São Luiz"),
+                        new Cidade(28L, "São José dos Campos"));
+        assertThat(listaObtida).size().isEqualTo(listaEsperada.size());
+        assertThat(listaObtida).containsAll(listaEsperada);
     }
 }

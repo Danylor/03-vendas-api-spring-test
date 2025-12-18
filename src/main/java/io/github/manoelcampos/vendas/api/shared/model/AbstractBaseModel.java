@@ -49,5 +49,4 @@ public abstract class AbstractBaseModel implements BaseModel {
     public boolean isSameId(final long id){
         return this.id != null && this.id == id;
     }
-
 }
