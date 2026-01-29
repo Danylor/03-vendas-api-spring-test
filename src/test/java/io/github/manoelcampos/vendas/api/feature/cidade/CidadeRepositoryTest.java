@@ -1,7 +1,6 @@
 package io.github.manoelcampos.vendas.api.feature.cidade;
 
 import org.junit.jupiter.api.Test;
-import org.springdoc.core.service.GenericResponseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
@@ -15,16 +14,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 // (API de Object Relational Mapping - ORM: Mapeamento Objeto-Relacional)
 @DataJpaTest
 class CidadeRepositoryTest {
-    /// Injeção de Dependêndica: instanciar automaticamente objetos
-    /// Só funciona se a classe onde o objeto será instanciado
-    /// for um Spring Bean, ou seja, for um objeto criado e gerenciado
-    /// pelo Spring.
-    /// `@Autowirded`: pedir pro spring instanciar um objeto pra mim.
-    /// Ele só faz isso com objetos Spring Bean.
     @Autowired
     private CidadeRepository repository;
-    @Autowired
-    private GenericResponseService responseBuilder;
 
     @Test
     void findByDescricaoLike() {
@@ -37,5 +28,24 @@ class CidadeRepositoryTest {
                         new Cidade(28L, "São José dos Campos"));
         assertThat(listaObtida).size().isEqualTo(listaEsperada.size());
         assertThat(listaObtida).containsAll(listaEsperada);
+    }
+
+
+    @Test
+    void deleteById() {
+        //Uma variável é como uma caixa também,
+        // mas quando ela contém null, é como se a caixa nao existisse
+        //Cidade cidade =  null;
+        //cidade.getId()
+
+        final long id = 28;
+        // TODO Usar Preconditions do AssertJ (ou do JUnit)
+        assertThat(repository.findById(id)).isPresent();
+
+        // delete from cidade where id = 28
+        repository.deleteById(id);
+
+        // Optional é como uma caixa que conter algo ou não
+        assertThat(repository.findById(id)).isEmpty();
     }
 }
