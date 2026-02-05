@@ -16,16 +16,16 @@ class ClienteServiceTest {
     @InjectMocks
     private ClienteService service;
 
-    @Mock
+    @Mock  // mock cria um fantoche
     private ClienteRepository repository;
 
     @Test
     void findByCpf() {
         final var cpfComSimolos = "348.113.930-66";
         final var cpfSemSimolos = "34811393066";
-        Optional<Cliente> optional = Optional.of(new Cliente());
-        Mockito.when(repository.findByCpf(cpfSemSimolos))
-                .thenReturn(optional);
+        Optional<Cliente> optional = Optional.of(new Cliente("Manoel",  cpfSemSimolos, null));
+        Mockito.when(repository.findByCpf(cpfSemSimolos)).thenReturn(optional);
+
         //assertTrue(service.findByCpf(cpfComSimolos).isPresent());
         //assertTrue(service.findByCpf(cpfSemSimolos).isPresent());
         //Mockito.verify(repository).findByCpf(cpf);
